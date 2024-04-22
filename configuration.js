@@ -1,12 +1,11 @@
-const mode = 0;
+const mode = 1;
 
 const host_local = "http://localhost:8080";
-const host_remote = "https://ducks-service-???.onrender.com";
+const host_remote = "https://test3-service-controge.onrender.com";
 
 function getHost() {
     return (mode == 0) ? host_local : host_remote;
 }
-
 function isLoggedIn() {
     if(localStorage.getItem("token")) {
         return true;
@@ -54,7 +53,7 @@ async function signup() {
     let email = document.getElementById("email").value;
     let username = document.getElementById("username").value;
     let password = document.getElementById("password").value;
-    let customer = {email:email, username: username, password: password}
+    let customer = {email:email, username: username, password: password};
     let request = {
         method: "POST",
         headers: {
@@ -65,7 +64,7 @@ async function signup() {
       try {
         let response = await fetch(getHost() + "/signup", request);
         if(response.status == 200) {  
-            alert("The registration was successful!")
+            alert("The registration was successful!");
             location.href = "login.html";
 
         } else {

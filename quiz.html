@@ -26,9 +26,9 @@
         <button id="nextButton" onclick="goNext()" >Next</button>
       </div>
     </div>
-
+    <script src="configuration.js"></script>
     <script>
-      let host = "http://localhost:8080";
+      let host = getHost();
       const urlParams = new URLSearchParams(window.location.search);
       const id = urlParams.get("id");
       let quiz = null;
@@ -42,10 +42,25 @@
       startTheQuiz();
 
       async function startTheQuiz() {
-        let response = await fetch(host + "/quizzes/" + id);
+		    const headers = {'Authorization' : `Bearer ${configuration.token()}`};
+        let response = await fetch(host + "/quizzes/" + id,
+        {method:'GET',
+        headers:headers});
         quiz = await response.json();
         await displayTheQuestion(0);
       }
+
+/**      async function getAll() {
+		    const headers = {'Authorization' : `Bearer ${configuration.token()}`};
+        let response = await fetch(host + "/questions", 
+        {method: 'GET',
+         headers: headers,
+        mode: 'cors'});
+        let result = await response.json();
+        return result;
+      }**/
+
+
 
       async function goNext() {
         updateUserAnswers(currentIndex);
@@ -114,24 +129,43 @@
         let div = document.createElement("div");
         div.className = "card";        
         let innerHtml = `
-         <img src="http://localhost:8080/questions/${question.id}/image" alt="question" style="width:100%">
-         <div class="container">
-           <h4><b>${question.id}</b></h4>
-           <p>${question.description}</p>
-           <form>
-               <input type="radio" id="optionA" name="answer" value="A">
-               <label for="optionA" name="optionA">${question.choices[0]}</label><br>
+      <div class="container">
+        <h4><b id="question_${question.id}">${question.id}</b></h4> 
+        <p>${question.description}</p>
+        <form>
+            <input type="radio" id="q${question.id}ptionA" name="q2Answer" value="A">
+            <label for="q${question.id}ptionA">${question.choices[0]}</label><br>
 
-               <input type="radio" id="optionB" name="answer" value="B">
-               <label for="optionB" name="optionB">${question.choices[1]}</label><br>
+            <input type="radio" id="q${question.id}ptionB" name="q2Answer" value="B">
+            <label for="q${question.id}ptionB">${question.choices[1]}</label><br>
 
-               <input type="radio" id="optionC" name="answer" value="C">
-               <label for="optionC" name="optionC">${question.choices[2]}</label><br>
-           </form>
-         </div>
-             `;
-        div.innerHTML = innerHtml;
-        item.appendChild(div);
+            <input type="radio" id="q${question.id}ptionC" name="q2Answer" value="C">
+            <label for="q${question.id}ptionC">${question.choices[2]}</label><br>       
+        </form> 
+      </div>
+   
+          `;
+          div.innerHTML = innerHtml;
+          item.appendChild(div);
+          
+          let imageurl = `${host}/questions/${question.id}/image`;
+          const headers= {'Authorization' : `Bearer ${configuration.token()}`};
+          fetch(imageurl, {
+            method: 'GET',
+            headers: headers,
+            mode: 'cors'
+          }).then(function(response){
+            if(response.status == 302){
+              console.log(response);
+              var image = document.createElement("img");
+              response.blob().then((blob) =>{
+                image.src = URL.createObjectURL(blob);
+                image.style.width = "100%";
+                let container = document.getElementById(`question_${question.id}`);
+                container.appendChild(image);
+              })
+            }
+          })
       }
     </script>
   </body>
